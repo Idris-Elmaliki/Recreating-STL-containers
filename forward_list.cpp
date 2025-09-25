@@ -57,6 +57,7 @@ public:
         }
     }
 
+ // need to figure out how to allow initializer_list with the implementation I had with the other 2 constructors
     forward_list(std::initializer_list<int> list) 
     { 
         for(auto& i : list) {
