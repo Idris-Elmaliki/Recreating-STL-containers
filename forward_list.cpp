@@ -115,7 +115,12 @@ public:
         m_length = start_capacity; 
     }
 
+<<<<<<< HEAD
     forward_list(std::initializer_list<T> list) 
+=======
+ // need to figure out how to allow initializer_list with the implementation I had with the other 2 constructors
+    forward_list(std::initializer_list<int> list) 
+>>>>>>> b1146de938c4f800ea0c144eff3520c00404ef81
     { 
         head = nullptr; 
         tail = head; 
@@ -423,6 +428,7 @@ public:
         return Iterator(tail->next); 
     }
 
+<<<<<<< HEAD
     ~forward_list() {
         Node<T>* temp = head; 
         while(temp) {
@@ -433,3 +439,12 @@ public:
         delete temp;
     }
 }; 
+=======
+    forward_list list(3, 10); 
+
+    for(auto &i : list)
+        std::cout << i << '\n'; 
+
+    std::cin.get(); 
+}
+>>>>>>> b1146de938c4f800ea0c144eff3520c00404ef81
