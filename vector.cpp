@@ -1,6 +1,6 @@
 #include <iostream>
 
-template<class T> 
+template<typename T> 
 class vector {
     T* m_data = nullptr; 
     size_t m_size = 0; 
@@ -68,6 +68,20 @@ public:
             m_data[i] = start_data; 
     }
 
+    vector(std::initializer_list<T> list) 
+    : m_size(list.size()), m_capacity(list.size())
+    { 
+        T* newData = new T[m_capacity]; 
+
+        size_t i = 0; 
+        for(auto& data : list) {
+            newData[i] = data; 
+            i++; 
+        }
+
+        m_data = newData;  
+    }
+
     void push_back(const T &newData) { 
         if(m_size == m_capacity) 
             Copy_Realloc(ReallocCalculation());     
@@ -75,7 +89,6 @@ public:
         m_data[m_size] = newData; 
         m_size++; 
     }
-
 
     // there isn't a move contrustor that allows for more than one parameter lol
     template<typename... Args> 
@@ -133,7 +146,7 @@ public:
 
     inline void insert(const size_t &position, const T &newData) {
         if(position > m_size)
-            exit(1); 
+            exit(EXIT_FAILURE); 
         
         if(position == (m_size)) {
             emplace_back(std::move(newData)); 
@@ -187,16 +200,25 @@ public:
 
     T& operator[](const size_t &i) {
         if(i >= m_size) 
-            exit(1); 
+            exit(EXIT_FAILURE); 
 
         return m_data[i]; 
     }
 
     constexpr T operator[](const size_t &i) const {
         if(i > m_size)
-            exit(1);
+            exit(EXIT_FAILURE);
 
         return m_data[i]; 
+    }
+
+    inline void operator=(const vector& other) {
+        if(this->m_capacity == other.m_capacity) {
+            this->m_data = other.m_data; 
+        }
+        else {
+            ReAlloc_Redef(other); 
+        }
     }
 
     bool operator==(const vector& other) {
@@ -211,16 +233,66 @@ public:
         return true; 
     }
 
-    inline void operator=(const vector& other) {
-        if(this->m_capacity == other.m_capacity) {
-            this->m_data = other.m_data; 
+    class Iterator {
+        T *ptr; 
+
+    public: 
+        Iterator(T* p) 
+        : ptr(p)
+        {}
+
+        T& operator*() {
+            return *ptr; 
         }
-        else {
-            ReAlloc_Redef(other); 
+
+        constexpr T operator*() const {
+            return *ptr; 
         }
+
+        T operator->() {
+            return ptr; 
+        }
+
+        Iterator& operator++() {
+            ptr++; 
+            return *this; 
+        }
+
+        bool operator==(const Iterator& other) {
+            return ptr = other.ptr; 
+        }
+
+        bool operator!=(const Iterator& other) {
+            return ptr != other.ptr; 
+        }
+    }; 
+
+    Iterator begin() {
+        return Iterator(m_data); 
+    }
+
+    constexpr Iterator begin() const {
+        return Iterator(m_data); 
+    }
+
+    Iterator end() {
+        return Iterator(m_data + m_size); 
+    }
+
+    constexpr Iterator end() const {
+        return Iterator(m_data + m_size); 
     }
 
     ~vector() {
         delete[] m_data; 
     }
 }; 
+
+int main(void) {
+    const vector<int> vec = {1, 2, 3}; 
+
+    for(auto& i : vec)
+        std::cout << i << '\n'; 
+
+    std::cin.get(); 
+} 
