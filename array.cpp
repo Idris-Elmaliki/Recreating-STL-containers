@@ -3,6 +3,7 @@
 template<typename T, size_t S> 
 class array {
     T m_arr[S] = {};  
+    size_t m_size = S; 
 public: 
     array(std::initializer_list<T> list) {
         if(list.size() > S)
@@ -20,7 +21,7 @@ public:
     }
 
     constexpr size_t size() const {
-        return S; 
+        return m_size; 
     }
 
     T front() {
@@ -56,5 +57,81 @@ public:
         }
 
         return true; 
+    }
+
+    class Iterator {
+        T* ptr; 
+
+    public: 
+        Iterator(T* ptr) 
+        : ptr(ptr)
+        {}
+
+        T& operator*() {
+            return *ptr; 
+        }
+
+        T operator->() {
+            return ptr; 
+        }
+
+        Iterator& operator++() {
+            ptr++;
+            return *this; 
+        }
+
+        bool operator==(const Iterator& other) {
+            return ptr = other.ptr; 
+        }
+
+        bool operator!=(const Iterator& other) {
+            return ptr != other.ptr; 
+        }
+    }; 
+
+    class const_iterator {
+        const T* ptr; 
+
+    public: 
+        const_iterator(const T* ptr) 
+        : ptr(ptr)
+        {}
+
+        constexpr const T& operator*() const {
+            return *ptr; 
+        }
+
+        constexpr T operator->() const {
+            return ptr; 
+        }
+
+        constexpr const_iterator& operator++() {
+            ptr++;
+            return *this; 
+        }
+
+        bool operator==(const const_iterator& other) {
+            return ptr = other.ptr; 
+        }
+
+        constexpr bool operator!=(const const_iterator& other) const {
+            return ptr != other.ptr; 
+        }
+    }; 
+
+    Iterator begin() {
+        return Iterator(m_arr); 
+    }
+
+    constexpr const_iterator begin() const noexcept {
+        return const_iterator(m_arr); 
+    }
+
+    Iterator end() {
+        return Iterator(m_arr + m_size); 
+    }
+
+    constexpr const_iterator end() const noexcept {
+        return const_iterator(m_arr + m_size); 
     }
 }; 
