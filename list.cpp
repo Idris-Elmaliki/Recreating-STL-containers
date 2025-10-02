@@ -5,20 +5,20 @@ class list {
     template<typename t>
     class Node 
     {
-        public: 
-        t data; 
+    public: 
+        t m_data; 
         Node<t>* prev; 
         Node<t>* next; 
 
         Node(const t &data = 0)
-        : data(data) {
+        : m_data(data) {
             prev = nullptr;
             next = nullptr;
         }
 
         template<typename... Args> 
         Node(Args... newData) 
-        : data(std::forward<Args>(newData)...) {
+        : m_data(std::forward<Args>(newData)...) {
             prev = nullptr;
             next = nullptr; 
         }
@@ -34,7 +34,7 @@ class list {
         {}
 
         T& operator*() { 
-            return ptr->data; 
+            return ptr->m_data; 
         }
 
         Iterator& operator++() { 
@@ -88,8 +88,9 @@ public:
             tail = head;
 
             for(int i = 1; i < start_capacity; i++) {
-                tail->next = AllocateNewNode(); 
-                tail->prev = tail; 
+                Node<T>* newNode = AllocateNewNode(); 
+                newNode->prev = tail; 
+                tail->next = newNode; 
                 tail = tail->next; 
             }
         }
@@ -103,8 +104,9 @@ public:
         tail = head; 
 
         for(int i = 1; i < start_capacity; i++) {
-            tail->next = Move_AllocateNewNode(start_data); 
-            tail->prev = tail;
+            Node<T>* newNode = Move_AllocateNewNode(start_data); 
+            newNode->prev = tail; 
+            tail->next = newNode; 
             tail = tail->next; 
         }
 
@@ -122,8 +124,9 @@ public:
                 tail = head; 
             } 
             else { 
-                tail->next = Move_AllocateNewNode(i); 
-                tail->prev = tail;
+                Node<T>* newNode = Move_AllocateNewNode(i); 
+                newNode->prev = tail; 
+                tail->next = newNode; 
                 tail = tail->next;
             }
         }
@@ -163,10 +166,10 @@ public:
     }
 
     void insert_after(const size_t& pos, const T& newData) {
-        if(pos > m_length)
+        if(pos >= m_length)
             exit(EXIT_FAILURE); 
         
-        if(pos == m_length) {
+        if(pos == m_length-1) {
             push_back(newData);
             return; 
         } 
@@ -174,12 +177,11 @@ public:
         Node<T>* newNode = AllocateNewNode(newData);
         Node<T>* temp = getNode(pos); 
 
-        newNode->next = temp->next; 
-        newNode->prev = temp->next->prev; 
         temp->next->prev = newNode; 
-        temp->next = newNode;
+        newNode->next = temp->next;
+        temp->next = newNode; 
+        newNode->prev = temp;
 
-        delete temp; 
         m_length++;
     }
 
@@ -194,7 +196,7 @@ public:
             tail = newNode;
             head = tail;  
         }
-        else  {
+        else {
             tail->next = newNode; 
             tail->prev = tail; 
             tail = tail->next; 
@@ -221,9 +223,9 @@ public:
 
     template<typename... Args>
     void emplace_after(const size_t& pos, Args&&... newData) {
-        if(pos > m_length)
+        if(pos >= m_length)
             exit(EXIT_FAILURE); 
-        else if(pos == m_length) {
+        else if(pos == m_length-1) {
             emplace_back(newData...);
             return; 
         } 
@@ -231,18 +233,17 @@ public:
         Node<T>* newNode = Move_AllocateNewNode(newData...); 
         Node<T>* temp = getNode(pos);
         
-        newNode->next = temp->next; 
-        newNode->prev = temp; 
         temp->next->prev = newNode; 
+        newNode->next = temp->next;
         temp->next = newNode; 
-        delete temp; 
+        newNode->prev = temp;   
 
         m_length++; 
     }
 
     T& at(const size_t& pos) {
         Node<T>* temp = getNode(pos); 
-        return temp->data; 
+        return temp->m_data; 
     }
 
     void pop_front() {
@@ -274,30 +275,26 @@ public:
         else {
             Node<T>* temp = tail; 
             
-            tail = temp->prev; 
-            tail->next = nullptr; 
+            tail = tail->prev; 
+            tail->next = nullptr;
             delete temp; 
         }
         m_length--; 
     }
 
     void erase_after(const size_t& pos) {
-        if(m_length == 0)
+        if(m_length == 0 || pos >= m_length-1)
             exit(EXIT_FAILURE); 
-        else if(pos >= m_length) 
-            exit(EXIT_FAILURE); 
-        
-        if(pos == 0) 
-            return pop_front();  
-        else if(pos == (m_length-1)  ) 
+          
+        if(pos == (m_length-2)) 
             return pop_back(); 
         
 
-        Node<T>* temp = getNode(pos); 
-        temp = temp->next; 
+        Node<T>* previousTemp = getNode(pos); 
+        Node<T>* temp = previousTemp->next; 
 
-        temp->next->prev = temp->prev; 
-        temp->prev->next = temp->next; 
+        previousTemp->next = temp->next; 
+        temp->next->prev = previousTemp; 
         
         delete temp; 
         m_length--; 
@@ -368,14 +365,14 @@ public:
 
     T front() {
         if(m_length != 0)
-            return head->data; 
+            return head->m_data; 
         
         exit(EXIT_FAILURE); 
     }
 
     T back() {
         if(m_length != 0)
-            return tail->data; 
+            return tail->m_data; 
         
         exit(EXIT_FAILURE);
     }
@@ -385,7 +382,7 @@ public:
 
         Node<T>* otherTemp = other.head; 
         while(otherTemp) {
-            emplace_back(otherTemp->data); 
+            emplace_back(otherTemp->m_data); 
             otherTemp = otherTemp->next;
         }
     }
@@ -398,7 +395,7 @@ public:
         Node<T>* otherTemp = other.head; 
 
         while(thisTemp) {
-            if(thisTemp->data != otherTemp->data)
+            if(thisTemp->m_data != otherTemp->m_data)
                 return false; 
             
             thisTemp = thisTemp->next;
@@ -428,25 +425,34 @@ public:
         return Iterator(tail->next); 
     }
 
+    void print_reverse() {
+        Node<T>* temp = tail; 
+
+        while(temp) {
+            std::cout << temp->m_data << '\n'; 
+            temp = temp->prev; 
+        }
+    }
+
     ~list() {
         Node<T>* temp = head; 
-        while(temp) {
-            delete temp; 
-            temp = temp->next; 
+        while(head) { 
+            head = temp->next; 
+            delete temp;
+            temp = head; 
         }
-        
-        delete temp;
     }
-}; 
+};  
 
 int main(void) {
     list<int> List = {1, 2, 3}; 
-    
-    List.erase_after(1); 
 
-    for(auto& i : List) {
+    List.emplace_after(1, 19); 
+    List.erase_after(1);
+    List.pop_back(); 
+
+    for(auto& i : List)
         std::cout << i << '\n'; 
-    }
 
     std::cin.get(); 
 }
