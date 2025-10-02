@@ -3,6 +3,7 @@
 template<typename T, size_t S> 
 class array {
     T m_arr[S] = {};  
+    size_t m_size = S; 
 public: 
     array(std::initializer_list<T> list) {
         if(list.size() > S)
@@ -20,7 +21,7 @@ public:
     }
 
     constexpr size_t size() const {
-        return S; 
+        return m_size; 
     }
 
     T front() {
@@ -70,20 +71,11 @@ public:
             return *ptr; 
         }
 
-        constexpr T& operator*() const {
-            return *ptr; 
-        }
-
         T operator->() {
             return ptr; 
         }
 
         Iterator& operator++() {
-            ptr++;
-            return *this; 
-        }
-
-        constexpr Iterator& operator++() const {
             ptr++;
             return *this; 
         }
@@ -97,11 +89,58 @@ public:
         }
     }; 
 
+    class const_iterator {
+        const T* ptr; 
+
+    public: 
+        const_iterator(const T* ptr) 
+        : ptr(ptr)
+        {}
+
+        constexpr const T& operator*() const {
+            return *ptr; 
+        }
+
+        constexpr T operator->() const {
+            return ptr; 
+        }
+
+        constexpr const_iterator& operator++() {
+            ptr++;
+            return *this; 
+        }
+
+        bool operator==(const const_iterator& other) {
+            return ptr = other.ptr; 
+        }
+
+        constexpr bool operator!=(const const_iterator& other) const {
+            return ptr != other.ptr; 
+        }
+    }; 
+
     Iterator begin() {
-        return Iterator(m_arr + 0); 
+        return Iterator(m_arr); 
+    }
+
+    constexpr const_iterator begin() const noexcept {
+        return const_iterator(m_arr); 
     }
 
     Iterator end() {
-        return Iterator(m_arr + S); 
+        return Iterator(m_arr + m_size); 
+    }
+
+    constexpr const_iterator end() const noexcept {
+        return const_iterator(m_arr + m_size); 
     }
 }; 
+
+int main(void) {
+    const array<int, 5> arr = {1, 2, 3, 4, 5}; 
+
+    for(auto& i : arr)
+        std::cout << i << '\n'; 
+
+    std::cin.get(); 
+} 
