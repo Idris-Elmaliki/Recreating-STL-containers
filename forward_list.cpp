@@ -6,17 +6,17 @@ class forward_list {
     class Node 
     {
         public: 
-        t data; 
+        t m_data; 
         Node<t>* next; 
 
         Node(const t &data = 0)
-        : data(data) {
+        : m_data(data) {
             next = nullptr;
         }
 
         template<typename... Args> 
         Node(Args... newData) 
-        : data(std::forward<Args>(newData)...) {
+        : m_data(std::forward<Args>(newData)...) {
             next = nullptr; 
         }
     }; 
@@ -31,7 +31,7 @@ class forward_list {
         {}
 
         T& operator*() { 
-            return ptr->data; 
+            return ptr->m_data; 
         }
 
         Iterator& operator++() { 
@@ -56,8 +56,9 @@ private:
         return new Node<T>(newData); 
     }
 
-    inline Node<T>* Move_AllocateNewNode(const T&& newData) {
-        return new Node<T>(std::move(newData)); 
+    template<typename... Args>
+    inline Node<T>* Move_AllocateNewNode(Args&&... newData) const {
+        return new Node<T>(std::forward<Args>(newData)...); 
     }
 
     inline Node<T>* getNode(const size_t& pos) { 
@@ -72,7 +73,7 @@ private:
         return node; 
     }
 
-    inline Node<T>* getPrevNodeTail() {
+    inline Node<T>* getPrevTailNode() {
         Node<T>* temp = head; 
 
         while(temp->next != tail) 
@@ -103,34 +104,29 @@ public:
 
     forward_list(const size_t& start_capacity, const T& start_data)
     { 
-        head = AllocateNewNode(start_data);
+        head = Move_AllocateNewNode(start_data);
         tail = head; 
 
         for(int i = 1; i < start_capacity; i++) {
-            tail->next = AllocateNewNode(start_data); 
+            tail->next = Move_AllocateNewNode(start_data); 
             tail = tail->next; 
         }
 
         m_length = start_capacity; 
     }
 
-<<<<<<< HEAD
     forward_list(std::initializer_list<T> list) 
-=======
- // need to figure out how to allow initializer_list with the implementation I had with the other 2 constructors
-    forward_list(std::initializer_list<int> list) 
->>>>>>> b1146de938c4f800ea0c144eff3520c00404ef81
     { 
         head = nullptr; 
         tail = head; 
 
         for(auto& i : list) {
             if(head == nullptr) {
-                head = AllocateNewNode(i); 
+                head = Move_AllocateNewNode(i); 
                 tail = head; 
             } 
             else { 
-                tail->next = AllocateNewNode(i); 
+                tail->next = Move_AllocateNewNode(i); 
                 tail = tail->next;
             }
         }
@@ -182,7 +178,6 @@ public:
         newNode->next = temp->next; 
         temp->next = newNode;
 
-        delete temp; 
         m_length++;
     }
 
@@ -191,7 +186,7 @@ public:
 */
     template<typename... Args>  
     void emplace_back(Args&&... newData) {
-        Node<T>* newNode = new Node<T>(std::forward<Args>(newData)...); 
+        Node<T>* newNode = Move_AllocateNewNode(newData...); 
         
         if(m_length == 0) {
             tail = newNode;
@@ -206,7 +201,7 @@ public:
  
     template<typename... Args>
     void emplace_front(Args&&... newData) {
-        Node<T>* newNode = new Node<T>(std::forward<Args>(newData)...); 
+        Node<T>* newNode = Move_AllocateNewNode(newData...); 
         
         if(m_length == 0) {
             head = newNode; 
@@ -229,19 +224,18 @@ public:
             return; 
         } 
 
-        Node<T>* newNode = new Node<T>(std::forward<Args>(newData)...); 
+        Node<T>* newNode = Move_AllocateNewNode(newData...); 
         Node<T>* temp = getNode(pos);
         
         newNode->next = temp->next; 
-        temp->next = newNode; 
-        delete temp; 
+        temp->next = newNode;  
 
         m_length++; 
     }
 
     T& at(const size_t& pos) {
         Node<T>* temp = getNode(pos); 
-        return temp->data; 
+        return temp->m_data; 
     }
 
     void pop_front() {
@@ -256,7 +250,7 @@ public:
             Node<T>* temp = head; 
 
             head = temp->next; 
-            temp->next = nullptr; 
+            temp = nullptr; 
             delete temp; 
         }
         m_length--; 
@@ -271,25 +265,23 @@ public:
             head = nullptr;  
         }
         else {
-            Node<T>* temp = getPrevNodeTail(); 
+            Node<T>* temp = getPrevTailNode(); 
             
             tail = temp; 
-            temp = temp->next; 
+            temp = nullptr; 
             delete temp; 
         }
         m_length--; 
     }
 
     void erase_after(const size_t& pos) {
-        if(m_length == 0)
-            exit(EXIT_FAILURE); 
-        else if(pos >= m_length) 
+        if(m_length == 0 || pos >= m_length)
             exit(EXIT_FAILURE); 
         
         if(pos == 0) 
             return pop_front();  
-        else if(pos == (m_length-1)  ) 
-            return pop_back(); 
+        else if(pos == (m_length-2)) 
+            return pop_back();
         
 
         Node<T>* prevTemp = getNode(pos); 
@@ -367,14 +359,14 @@ public:
 
     T front() {
         if(m_length != 0)
-            return head->data; 
+            return head->m_data; 
         
         exit(EXIT_FAILURE); 
     }
 
     T back() {
         if(m_length != 0)
-            return tail->data; 
+            return tail->m_data; 
         
         exit(EXIT_FAILURE);
     }
@@ -384,7 +376,7 @@ public:
 
         Node<T>* otherTemp = other.head; 
         while(otherTemp) {
-            push_back(otherTemp->data); 
+            push_back(otherTemp->m_data); 
             otherTemp = otherTemp->next;
         }
     }
@@ -397,7 +389,7 @@ public:
         Node<T>* otherTemp = other.head; 
 
         while(thisTemp) {
-            if(thisTemp->data != otherTemp->data)
+            if(thisTemp->m_data != otherTemp->m_data)
                 return false; 
             
             thisTemp = thisTemp->next;
@@ -427,23 +419,12 @@ public:
         return Iterator(tail->next); 
     }
 
-<<<<<<< HEAD
     ~forward_list() {
         Node<T>* temp = head; 
-        while(temp) {
-            delete temp; 
-            temp = temp->next; 
+        while(head) { 
+            head = temp->next; 
+            delete temp;
+            temp = head; 
         }
-        
-        delete temp;
     }
 }; 
-=======
-    forward_list list(3, 10); 
-
-    for(auto &i : list)
-        std::cout << i << '\n'; 
-
-    std::cin.get(); 
-}
->>>>>>> b1146de938c4f800ea0c144eff3520c00404ef81
