@@ -57,4 +57,51 @@ public:
 
         return true; 
     }
+
+    class Iterator {
+        T* ptr; 
+
+    public: 
+        Iterator(T* ptr) 
+        : ptr(ptr)
+        {}
+
+        T& operator*() {
+            return *ptr; 
+        }
+
+        constexpr T& operator*() const {
+            return *ptr; 
+        }
+
+        T operator->() {
+            return ptr; 
+        }
+
+        Iterator& operator++() {
+            ptr++;
+            return *this; 
+        }
+
+        constexpr Iterator& operator++() const {
+            ptr++;
+            return *this; 
+        }
+
+        bool operator==(const Iterator& other) {
+            return ptr = other.ptr; 
+        }
+
+        bool operator!=(const Iterator& other) {
+            return ptr != other.ptr; 
+        }
+    }; 
+
+    Iterator begin() {
+        return Iterator(m_arr + 0); 
+    }
+
+    Iterator end() {
+        return Iterator(m_arr + S); 
+    }
 }; 
