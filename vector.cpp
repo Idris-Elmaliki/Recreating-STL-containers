@@ -3,7 +3,7 @@
 template<typename T> 
 class vector {
     T* m_data = nullptr; 
-    size_t m_size = 0; 
+    size_t m_size; 
     size_t m_capacity;  
 
     inline void Copy_Realloc(
@@ -53,15 +53,14 @@ class vector {
 
 public:
     vector(const size_t &start_capacity = 0) 
-    : m_capacity(start_capacity)
+    : m_size(0), m_capacity(start_capacity)
     {
         m_data = new T[m_size]; 
     }
 
     vector(const size_t &start_capacity, const T& start_data) 
-    : m_capacity(start_capacity)
-    {
-        m_size = start_capacity;     
+    : m_size(start_capacity), m_capacity(start_capacity)
+    {     
         m_data = new T[m_size]; 
     
         for(int i = 0; i < start_capacity; i++)
@@ -287,12 +286,3 @@ public:
         delete[] m_data; 
     }
 }; 
-
-int main(void) {
-    const vector<int> vec = {1, 2, 3}; 
-
-    for(auto& i : vec)
-        std::cout << i << '\n'; 
-
-    std::cin.get(); 
-} 
