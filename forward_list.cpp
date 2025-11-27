@@ -429,9 +429,3 @@ public:
         }
     }
 }; 
-
-int main(void) {
-    forward_list<int>::Node<int>(1); 
-    
-
-}

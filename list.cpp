@@ -70,7 +70,7 @@ private:
         
         Node<T>* node = head; 
 
-        for(int i = 0; i < pos; i++) 
+        for(size_t i = 0; i < pos; i++) 
             node = node->next; 
 
         return node; 
@@ -443,16 +443,3 @@ public:
         }
     }
 };  
-
-int main(void) {
-    list<int> List = {1, 2, 3}; 
-
-    List.emplace_after(1, 19); 
-    List.erase_after(1);
-    List.pop_back(); 
-
-    for(auto& i : List)
-        std::cout << i << '\n'; 
-
-    std::cin.get(); 
-}
