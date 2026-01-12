@@ -1,8 +1,20 @@
 # Recreating-STL-containers
-This project is the recreating, debatably optimizating but most definitely better readability of the STL containers in C++.
+About
+=====
+
+This project is the recreating, "optimizating" (no where close) but most definitely better readability of the STL containers in C++.
 This includes but not limited to:
-      - std::array
-      - std::vector
-      - std::list
-      - std::stack
-      - std::map
+- std::array
+- std::vector
+- std::list
+- std::deque
+- std::unordered_map
+- etc.
+
+Main Purose of this Project
+---------------------------
+
+Whether I reach my goals of creating a more readable and somewhat reliable *"alternative"* to the **STL** containers, they aren't the main driving force behind the project!
+The main drive for this project is 
+1. To further hone my *memory management* skils, hence the lack of smart pointer usage within the project.
+2. And shockingly, to also hone my knowledge on DSA to gain almost mastery for the Data Structures and the Algorithms used alongside them (think of BFS and DFS).  
