@@ -135,12 +135,3 @@ public:
         return const_iterator(m_arr + m_size); 
     }
 }; 
-
-int main(void) {
-    const array<int, 5> arr = {1, 2, 3, 4, 5}; 
-
-    for(auto& i : arr)
-        std::cout << i << '\n'; 
-
-    std::cin.get(); 
-} 
