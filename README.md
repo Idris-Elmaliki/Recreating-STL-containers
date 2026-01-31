@@ -15,6 +15,6 @@ Main Purose of this Project
 ---------------------------
 
 Whether I reach my goals of creating a more readable and somewhat reliable *"alternative"* to the **STL** containers, they aren't the main driving force behind the project!
-The main drive for this project is 
+The main drive for this project is the following:
 1. To further hone my *memory management* skils, hence the lack of smart pointer usage within the project.
-2. And shockingly, to also hone my knowledge on DSA to gain almost mastery for the Data Structures and the Algorithms used alongside them (think of BFS and DFS).  
+2. To hone my knowledge on DSA to gain almost mastery for the Data Structures and the Algorithms used alongside them (think of BFS and DFS).  
