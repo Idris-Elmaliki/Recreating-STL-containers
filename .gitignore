@@ -1,3 +1,6 @@
 a.exe
 CppProperties.json
 /.vs
+
+a.out
+.vscode
