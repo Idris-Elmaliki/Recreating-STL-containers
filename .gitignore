@@ -4,3 +4,19 @@ CppProperties.json
 
 a.out
 .vscode
+
+.DS_Store
+
+*.dSYM/
+# Object files
+*.o
+*.obj
+
+# Debug symbols
+*.pdb
+*.dSYM/
+
+# Executables
+*.exe
+*.out
+a.out
