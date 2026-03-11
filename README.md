@@ -9,7 +9,6 @@ This includes but not limited to:
 - std::list
 - std::deque
 - std::unordered_map
-- etc.
 
 Main Purose of this Project
 ---------------------------
